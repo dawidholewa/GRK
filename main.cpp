@@ -3,12 +3,17 @@
 #include <iostream>
 #include <GL/glut.h>
 #include "include/Pokoj.h"
+#include "include/Tekstura.h"
 
 using namespace std;
+Tekstura* textura;
 
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
-
+    glEnable(GL_TEXTURE_2D);
+    textura = new Tekstura();
+    textura->laduj("data/podloga.bmp");
+    textura->laduj("data/sciana.bmp");
 }
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
@@ -24,8 +29,9 @@ void wyswietl() {
 
     // TUTAJ RESZTA KODU !!!
     glPushMatrix();
-        glColor3f(0.5f,0.5f,0.5f);
-        Pokoj* p = new Pokoj(10.0f, true);
+        //glColor3f(0.5f,0.5f,0.5f);
+        Pokoj* p = new Pokoj(100.0f, true);
+        p->SetTeksturaPodlogi(textura->pobierz(0));
         p->Rysuj();
     glPopMatrix();
 

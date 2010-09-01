@@ -22,15 +22,38 @@ Pokoj::Pokoj(float bok, bool sciany){
         w[6][0] =  bok/2; w[6][1] = bok;  w[6][2] =  bok/2;
         w[7][0] =  bok/2; w[7][1] = bok;  w[7][2] = -bok/2;
     }
+
+    // Ustawienie powtorzen tekstury.
+    pt = (int) (bok/10);
 }
 
 void Pokoj::Rysuj() {
+    bool isPodlogaT = false;
+    bool isScianyT = false;
+
     glPushMatrix();
+        if(tPodloga) {
+            glBindTexture(GL_TEXTURE_2D, *tPodloga);
+            isPodlogaT = true;
+        }
+
         glBegin(GL_QUADS);
             // Ustawienie normalnej dla podlogi (niezbedna do oswietlenia).
             glNormal3f(0.0f, 1.0f, 0.0f);
-            for (int i = 0; i < 4 ;i++ ) glVertex3fv(w[i]);
+            if(isPodlogaT) glTexCoord2f(0, pt);
+            glVertex3fv(w[0]);
+            if(isPodlogaT) glTexCoord2f(pt, pt);
+            glVertex3fv(w[1]);
+            if(isPodlogaT) glTexCoord2f(pt, 0);
+            glVertex3fv(w[2]);
+            if(isPodlogaT) glTexCoord2f(0, 0);
+            glVertex3fv(w[3]);
         glEnd();
+
+        if(tSciany) {
+            glBindTexture(GL_TEXTURE_2D, *tSciany);
+            isScianyT = true;
+        }
 
         if (GetSciany()) {
             glBegin(GL_QUADS);

@@ -18,6 +18,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="glut32" />
+					<Add library="glaux" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -36,7 +37,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="include\Pokoj.h" />
+		<Unit filename="include\Tekstura.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src\Pokoj.cpp" />
+		<Unit filename="src\Tekstura.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
