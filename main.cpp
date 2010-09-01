@@ -3,6 +3,7 @@
 #include <iostream>
 #include <GL/glut.h>
 #include "include/Pokoj.h"
+#include "include/Pudelko.h"
 #include "include/Tekstura.h"
 
 using namespace std;
@@ -16,9 +17,13 @@ void init() {
     textura = new Tekstura();
     textura->laduj("data/podloga.bmp");
     textura->laduj("data/sciana.bmp");
+    textura->laduj("data/box.bmp");
 
     // Wlaczenie pomijania niewidocznych scian podczas renderowania.
     glEnable(GL_CULL_FACE);
+
+    // Niezbedne do tego aby uniknac wzajemnego przenikania sie obiektow.
+    glEnable(GL_DEPTH_TEST);
 }
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
@@ -38,6 +43,12 @@ void wyswietl() {
         p->SetTeksturaPodlogi(textura->pobierz(0));
         p->SetTeksturaSciany(textura->pobierz(1));
         p->Rysuj();
+    glPopMatrix();
+
+    glPushMatrix();
+        Pudelko* box = new Pudelko(20);
+        box->SetTekstura(textura->pobierz(2));
+        box->Rysuj();
     glPopMatrix();
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
