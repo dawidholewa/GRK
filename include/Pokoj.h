@@ -14,7 +14,7 @@ class Pokoj
     protected:
     private:
         bool bSciany;
-        float w[4][3];
+        float w[8][3];
 };
 
 #endif // POKOJ_H
