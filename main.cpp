@@ -10,10 +10,15 @@ Tekstura* textura;
 
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
+
+    // Uruchomienie i zaladowanie tekstru.
     glEnable(GL_TEXTURE_2D);
     textura = new Tekstura();
     textura->laduj("data/podloga.bmp");
     textura->laduj("data/sciana.bmp");
+
+    // Wlaczenie pomijania niewidocznych scian podczas renderowania.
+    glEnable(GL_CULL_FACE);
 }
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
@@ -23,15 +28,15 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(100.0f, 50.0f, 100.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(80.0f, 20.0f, 80.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
     // TUTAJ RESZTA KODU !!!
     glPushMatrix();
-        //glColor3f(0.5f,0.5f,0.5f);
         Pokoj* p = new Pokoj(100.0f, true);
         p->SetTeksturaPodlogi(textura->pobierz(0));
+        p->SetTeksturaSciany(textura->pobierz(1));
         p->Rysuj();
     glPopMatrix();
 

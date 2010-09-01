@@ -59,16 +59,24 @@ void Pokoj::Rysuj() {
             glBegin(GL_QUADS);
                 // Lewa sciana
                 glNormal3f(1.0f, 0.0f, 0.0f);
+                if(isScianyT) glTexCoord2f(0, 0);
                 glVertex3fv(w[0]);
+                if(isScianyT) glTexCoord2f(pt, 0);
                 glVertex3fv(w[3]);
+                if(isScianyT) glTexCoord2f(pt, pt);
                 glVertex3fv(w[4]);
+                if(isScianyT) glTexCoord2f(0, pt);
                 glVertex3fv(w[5]);
 
                 // Tylnia sciana
                 glNormal3f(0.0f, 0.0f, 1.0f);
+                if(isScianyT) glTexCoord2f(0, 0);
                 glVertex3fv(w[3]);
+                if(isScianyT) glTexCoord2f(pt, 0);
                 glVertex3fv(w[2]);
+                if(isScianyT) glTexCoord2f(pt, pt);
                 glVertex3fv(w[7]);
+                if(isScianyT) glTexCoord2f(0, pt);
                 glVertex3fv(w[4]);
             glEnd();
         }
