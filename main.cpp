@@ -25,8 +25,7 @@ void wyswietl() {
     // TUTAJ RESZTA KODU !!!
     glPushMatrix();
         glColor3f(0.5f,0.5f,0.5f);
-        glTranslatef(0.0f, 1.0f, 0.0f);
-        Pokoj* p = new Pokoj(10.0f);
+        Pokoj* p = new Pokoj(10.0f, true);
         p->Rysuj();
     glPopMatrix();
 
