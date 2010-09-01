@@ -2,6 +2,7 @@
 // Date: 01-09-2010
 #include <iostream>
 #include <GL/glut.h>
+#include "include/Pokoj.h"
 
 using namespace std;
 
@@ -23,7 +24,10 @@ void wyswietl() {
 
     // TUTAJ RESZTA KODU !!!
     glPushMatrix();
-        glutSolidSphere(10.0f, 100,100);
+        glColor3f(0.5f,0.5f,0.5f);
+        glTranslatef(0.0f, 1.0f, 0.0f);
+        Pokoj* p = new Pokoj(10.0f);
+        p->Rysuj();
     glPopMatrix();
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
