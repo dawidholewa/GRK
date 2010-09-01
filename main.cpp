@@ -9,7 +9,7 @@ using namespace std;
 void init() {
 
     // Ustawienie koloru tla calej aplikacji.
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 }
 
@@ -19,7 +19,15 @@ void wyswietl() {
     // Czyszczenie buforow.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Ustawienie kierunku w ktorym bedziemy patrzec.
+    gluLookAt(100.0f, 50.0f, 100.0f, // x,y,z Lokalizacja oka.
+                0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
+                0.0f,  1.0f,   0.0f);
+
     // TUTAJ RESZTA KODU !!!
+    glPushMatrix();
+        glutSolidSphere(10.0f, 100,100);
+    glPopMatrix();
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
     glFlush();
@@ -43,7 +51,7 @@ void skalujObraz(int szer, int wys) {
     glLoadIdentity();
 
     // Ustawiamy widok odpowiedniej perspektywy.
-    gluPerspective(60, stosunek, 0.5f, 100.0f);
+    gluPerspective(45, stosunek, 0.1f, 1000.0f);
 
     // Przelaczamy sie na macierz dotyczaca modelu.
     glMatrixMode(GL_MODELVIEW);
@@ -65,4 +73,24 @@ void klawiatura(unsigned char klawisz, int x, int y) {
 // Glowna funkcja programu.
 int main(int argc, char * argv[]) {
 
+    // Inicjalizacja gluta.
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+
+    // Ustawienie nazwy okna.
+    glutCreateWindow("Projekt na zaliczenie");
+
+    // Zaladowanie naszych ustawien.
+    init();
+
+    // Ustawienie funkcji odpowiedzialnych kolejno za obsluge sceny, skalowania obrazu oraz klawiatury.
+    glutDisplayFunc(wyswietl);
+    glutReshapeFunc(skalujObraz);
+    glutKeyboardFunc(klawiatura);
+
+    // Uruchomienie glownej petli OpenGLa programu
+    glutMainLoop();
+
+    return 0;
 }
