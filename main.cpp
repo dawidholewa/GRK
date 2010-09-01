@@ -8,9 +8,6 @@ using namespace std;
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
 
-    // Ustawienie koloru tla calej aplikacji.
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
 }
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
