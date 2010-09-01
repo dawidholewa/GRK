@@ -33,7 +33,7 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(80.0f, 20.0f, 80.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(50.0f, 30.0f, 50.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
@@ -46,9 +46,11 @@ void wyswietl() {
     glPopMatrix();
 
     glPushMatrix();
-        Pudelko* box = new Pudelko(20);
+        float swiatlo[3] = {0.0f, 30.0f,0.0f};
+        Pudelko* box = new Pudelko(10,10,10);
         box->SetTekstura(textura->pobierz(2));
         box->Rysuj();
+        if (box->obliczCien(0.1f,swiatlo)) box->RysujCien();
     glPopMatrix();
 
     // Polecenie wykonania wywolanych do tej pory funkcji.

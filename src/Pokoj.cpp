@@ -33,6 +33,7 @@ void Pokoj::Rysuj() {
 
     glPushMatrix();
         if(tPodloga) {
+            glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, *tPodloga);
             isPodlogaT = true;
         }
@@ -51,6 +52,7 @@ void Pokoj::Rysuj() {
         glEnd();
 
         if(tSciany) {
+            glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, *tSciany);
             isScianyT = true;
         }
