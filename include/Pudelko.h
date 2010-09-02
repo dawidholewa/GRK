@@ -12,13 +12,23 @@ class Pudelko
 
         void Rysuj();
         void RysujCien();
+        void RysujPiramide(int szer, int wys);
 
     protected:
     private:
-        GLuint* t; // Tekstura pudelka
+        GLuint* t; // Tekstura pudelka.
+        GLuint box; // Lista wyswietlania pudelka.
+
+        float szerokosc;
+        float glebokosc;
+        float wysokosc;
+
         float w[8][3];
         float c[8][3];
         float wsp[8];
+        bool wygenerowane; // Czy pudelko zostalo juz wygenerowane.
+
+        void generujPudelko();
 };
 
 #endif // PUDELKO_H

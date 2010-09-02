@@ -3,12 +3,19 @@
 
 Pudelko::Pudelko(float wys, float szer, float gl, float polozenie_y)
 {
-    // Sprawdzenie poprawnosci wymiarow bokow
+    // Ustawienie niezbednych zmiennych.
+    wygenerowane = false;
+
+    // Sprawdzenie poprawnosci wymiarow bokow.
     if (wys == 0)  wys = 1;
     if (szer == 0) szer = wys;
     if (gl == 0)   gl = szer;
 
-    // Kolejne wspolrzedne wierzcholkow pude³ka.
+    szerokosc = szer;
+    wysokosc = wys;
+    glebokosc = gl;
+
+    // Kolejne wspolrzedne wierzcholkow pudelka.
     // Wspolrzedne gory
     w[0][0] = -szer/2; w[0][1] = 0.0f + polozenie_y; w[0][2] =  gl/2;
     w[1][0] =  szer/2; w[1][1] = 0.0f + polozenie_y; w[1][2] =  gl/2;
@@ -20,101 +27,145 @@ Pudelko::Pudelko(float wys, float szer, float gl, float polozenie_y)
     w[6][0] =  szer/2; w[6][1] =  wys + polozenie_y; w[6][2] =  gl/2;
     w[7][0] =  szer/2; w[7][1] =  wys + polozenie_y; w[7][2] = -gl/2;
 }
-
-void Pudelko::Rysuj() {
+void Pudelko::generujPudelko() {
     bool isTekstura = false;
     int pt = 1;
+
+    box = glGenLists(1);
+
+    glNewList(box,GL_COMPILE);
         glPushMatrix();
-        if(t) {
-            glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, *t);
-            isTekstura = true;
+            if(t) {
+                glEnable(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, *t);
+                isTekstura = true;
+            }
+
+            // Zmieniamy kierunek wierzcholkow.
+            glFrontFace(GL_CW); // Zgodny ze wskazowkami zegara.
+
+            // Podloga
+            glBegin(GL_QUADS);
+                glNormal3f(0.0f, -1.0f, 0.0f);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[0]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[1]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[2]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[3]);
+            glEnd();
+
+            // Zmieniamy kierunek wierzcholkow.
+            glFrontFace(GL_CCW); // Przeciwny do kierunku wskazowek zegara.
+
+            // Sufit
+            glBegin(GL_QUADS);
+                glNormal3f(0.0f, 1.0f, 0.0f);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[4]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[5]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[6]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[7]);
+            glEnd();
+
+            float normalne[4][3] = {
+                { 0.0f, 0.0f, 1.0f},
+                { 1.0f, 0.0f, 0.0f},
+                { 0.0f, 0.0f,-1.0f},
+                {-1.0f, 0.0f, 0.0f}
+            };
+
+            glBegin(GL_QUADS);
+                // Sciana przednia
+                glNormal3fv(normalne[0]);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[0]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[1]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[6]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[5]);
+
+                // Sciana prawa
+                glNormal3fv(normalne[1]);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[1]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[2]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[7]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[6]);
+
+                // Sciana tylnia
+                glNormal3fv(normalne[2]);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[2]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[3]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[4]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[7]);
+
+                // Sciana lewa
+                glNormal3fv(normalne[3]);
+                if(isTekstura) glTexCoord2f(0, pt);
+                glVertex3fv(w[3]);
+                if(isTekstura) glTexCoord2f(pt, pt);
+                glVertex3fv(w[0]);
+                if(isTekstura) glTexCoord2f(pt, 0);
+                glVertex3fv(w[5]);
+                if(isTekstura) glTexCoord2f(0, 0);
+                glVertex3fv(w[4]);
+            glEnd();
+        glPopMatrix();
+    glEndList();
+}
+void Pudelko::Rysuj() {
+    if(!wygenerowane) {
+        generujPudelko();
+        wygenerowane = true;
+    }
+    glCallList(box);
+}
+
+void Pudelko::RysujPiramide(int szer, int wys) {
+    if(!wygenerowane) {
+        generujPudelko();
+        wygenerowane = true;
+    }
+
+    if(wys > szer) wys = szer;
+
+    float przes = (szer)*szerokosc;
+    glTranslatef(-przes/2,0.0f,-przes/2);
+    glPushMatrix();
+        for(int i = 0; i < wys; i++) {
+            // Generowanie kolejnych poziomow. 0 <-> y
+            glTranslatef(0.0f,szerokosc,0.0f);
+            glPushMatrix();
+                for(int j = szer-i; j > 0; j--) {
+                    // Generowanie kolejnych rzedow. -z <-> z
+                    glTranslatef(0.0f,0.0f,szerokosc);
+                    glPushMatrix();
+                        for(int k = szer-i; k > 0; k--) {
+                            // Generowanie jednego rzedu. -x <-> x
+                            glTranslatef(szerokosc,0.0f,0.0f);
+                            glCallList(box);
+                        }
+                    glPopMatrix();
+                }
+            glPopMatrix();
+            // Przesuniecie poziomu tak aby kazy poziom byl ulozony na srodku poprzedniego.
+            glTranslatef(szerokosc/2,0.0f,szerokosc/2);
         }
-
-        // Zmieniamy kierunek wierzcholkow.
-        glFrontFace(GL_CW); // Zgodny ze wskazowkami zegara.
-
-        // Podloga
-        glBegin(GL_QUADS);
-            glNormal3f(0.0f, -1.0f, 0.0f);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[0]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[1]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[2]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[3]);
-        glEnd();
-
-        // Zmieniamy kierunek wierzcholkow.
-        glFrontFace(GL_CCW); // Przeciwny do kierunku wskazowek zegara.
-
-        // Sufit
-        glBegin(GL_QUADS);
-            glNormal3f(0.0f, 1.0f, 0.0f);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[4]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[5]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[6]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[7]);
-        glEnd();
-
-        float normalne[4][3] = {
-            { 0.0f, 0.0f, 1.0f},
-            { 1.0f, 0.0f, 0.0f},
-            { 0.0f, 0.0f,-1.0f},
-            {-1.0f, 0.0f, 0.0f}
-        };
-
-        glBegin(GL_QUADS);
-            // Sciana przednia
-            glNormal3fv(normalne[0]);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[0]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[1]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[6]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[5]);
-
-            // Sciana prawa
-            glNormal3fv(normalne[1]);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[1]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[2]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[7]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[6]);
-
-            // Sciana tylnia
-            glNormal3fv(normalne[2]);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[2]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[3]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[4]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[7]);
-
-            // Sciana lewa
-            glNormal3fv(normalne[3]);
-            if(isTekstura) glTexCoord2f(0, pt);
-            glVertex3fv(w[3]);
-            if(isTekstura) glTexCoord2f(pt, pt);
-            glVertex3fv(w[0]);
-            if(isTekstura) glTexCoord2f(pt, 0);
-            glVertex3fv(w[5]);
-            if(isTekstura) glTexCoord2f(0, 0);
-            glVertex3fv(w[4]);
-        glEnd();
     glPopMatrix();
 }
 

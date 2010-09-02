@@ -8,6 +8,7 @@
 
 using namespace std;
 Tekstura* textura;
+float obrot = 10;
 
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
@@ -33,25 +34,24 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(50.0f, 30.0f, 50.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(  70.0f, 90.0f, 70.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
     // TUTAJ RESZTA KODU !!!
     glPushMatrix();
-        Pokoj* p = new Pokoj(100.0f, true);
+        Pokoj* p = new Pokoj(140.0f, true);
         p->SetTeksturaPodlogi(textura->pobierz(0));
         p->SetTeksturaSciany(textura->pobierz(1));
         p->Rysuj();
     glPopMatrix();
 
     glPushMatrix();
-        float swiatlo[3] = {0.0f, 30.0f,0.0f};
-        Pudelko* box = new Pudelko(10,10,10);
+        Pudelko* box = new Pudelko(10);
         box->SetTekstura(textura->pobierz(2));
-        box->Rysuj();
-        if (box->obliczCien(0.1f,swiatlo)) box->RysujCien();
+        box->RysujPiramide(3,2);
     glPopMatrix();
+
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
     glFlush();
@@ -90,6 +90,14 @@ void klawiatura(unsigned char klawisz, int x, int y) {
     switch(klawisz) {
         case 27: // Zamkniecie programu po wcisnieciu klawisza ESC.
             exit(0);
+            break;
+        case '=':
+            obrot++;
+            glutPostRedisplay();
+            break;
+        case '-':
+            obrot--;
+            glutPostRedisplay();
             break;
     }
 }
