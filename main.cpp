@@ -14,6 +14,39 @@ Tekstura* textura;
 float obrot = 0.0f;
 bool obrot_kol = false;
 
+// Listy obiektow w celu przyspieszenia renderowania.
+GLuint choinka; // Lista wyswietlania kilku kuli.
+
+// Tutaj tworzymy generujemy listy wszystkich obiektow.
+void initObjects() {
+    // Choinka z kulek.
+    choinka = glGenLists(1);
+
+    int ilosc_poziomow_choinki = 15;
+    glNewList(choinka,GL_COMPILE);
+        glPushMatrix();
+
+            float s[3] = {0.0f,4.0f+ilosc_poziomow_choinki*5,0.0f};
+            float kolor[5][3] = {
+                {0.0f,0.4f,0.8f},
+                {0.2f,0.6f,0.4f},
+                {0.4f,0.6f,0.2f},
+                {0.8f,0.4f,0.0f},
+                {0.5f,0.4f,0.5f}
+            };
+            Kula* ball = new Kula(2,s);
+            ball->SetKolors(3,*kolor);
+            for(int i=0; i<ilosc_poziomow_choinki; i++) {
+                glPushMatrix();
+                glTranslatef(0.0f,-5.0*i,0.0f);
+                ball->RysujAnimacje(i+3,i+1, true);
+                glPopMatrix();
+            }
+        glPopMatrix();
+    glEndList();
+
+}
+
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
 
@@ -29,6 +62,9 @@ void init() {
 
     // Niezbedne do tego aby uniknac wzajemnego przenikania sie obiektow.
     glEnable(GL_DEPTH_TEST);
+
+    // Generowanie listy obiektow.
+    initObjects();
 }
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
@@ -62,12 +98,9 @@ void wyswietl() {
 //    glPopMatrix();
 
     glPushMatrix();
-        float s[3] = {0.0f,30.0f,0.0f};
-        Kula* ball = new Kula(2,s);
-        float o[4] = {obrot,0.0f, 1.0f, 0.0f};
-        ball->RysujAnimacje(10,5,o);
+        glRotatef(obrot, 0.0f, 1.0f, 0.0f);
+        glCallList(choinka);
     glPopMatrix();
-
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
     glFlush();
