@@ -35,27 +35,27 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(  70.0f, 90.0f, 70.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(  140.0f, 40.0f, 140.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
     // TUTAJ RESZTA KODU !!!
-//    glPushMatrix();
-//        Pokoj* p = new Pokoj(140.0f, true);
-//        p->SetTeksturaPodlogi(textura->pobierz(0));
-//        p->SetTeksturaSciany(textura->pobierz(1));
-//        p->Rysuj();
-//    glPopMatrix();
-
-//    glPushMatrix();
-//        Pudelko* box = new Pudelko(10);
-//        box->SetTekstura(textura->pobierz(2));
-//        box->RysujPiramide(3,2);
-//    glPopMatrix();
-    //glLoadIdentity();
     glPushMatrix();
-        float s[3] = {0.0f,0.0f,0.0f};
-        Kula* ball = new Kula(10,&s[3]);
+        Pokoj* p = new Pokoj(140.0f, true);
+        p->SetTeksturaPodlogi(textura->pobierz(0));
+        p->SetTeksturaSciany(textura->pobierz(1));
+        p->Rysuj();
+    glPopMatrix();
+
+    glPushMatrix();
+        Pudelko* box = new Pudelko(10);
+        box->SetTekstura(textura->pobierz(2));
+        box->RysujPiramide(3,2);
+    glPopMatrix();
+
+    glPushMatrix();
+        float s[3] = {0.0f,30.0f,0.0f};
+        Kula* ball = new Kula(10,s);
         ball->Rysuj();
     glPopMatrix();
 
