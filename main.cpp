@@ -2,6 +2,7 @@
 // Date: 01-09-2010
 #include <iostream>
 #include <GL/glut.h>
+#include "include/Kula.h"
 #include "include/Pokoj.h"
 #include "include/Pudelko.h"
 #include "include/Tekstura.h"
@@ -39,17 +40,23 @@ void wyswietl() {
                 0.0f,  1.0f,   0.0f);
 
     // TUTAJ RESZTA KODU !!!
-    glPushMatrix();
-        Pokoj* p = new Pokoj(140.0f, true);
-        p->SetTeksturaPodlogi(textura->pobierz(0));
-        p->SetTeksturaSciany(textura->pobierz(1));
-        p->Rysuj();
-    glPopMatrix();
+//    glPushMatrix();
+//        Pokoj* p = new Pokoj(140.0f, true);
+//        p->SetTeksturaPodlogi(textura->pobierz(0));
+//        p->SetTeksturaSciany(textura->pobierz(1));
+//        p->Rysuj();
+//    glPopMatrix();
 
+//    glPushMatrix();
+//        Pudelko* box = new Pudelko(10);
+//        box->SetTekstura(textura->pobierz(2));
+//        box->RysujPiramide(3,2);
+//    glPopMatrix();
+    //glLoadIdentity();
     glPushMatrix();
-        Pudelko* box = new Pudelko(10);
-        box->SetTekstura(textura->pobierz(2));
-        box->RysujPiramide(3,2);
+        float s[3] = {0.0f,0.0f,0.0f};
+        Kula* ball = new Kula(10,&s[3]);
+        ball->Rysuj();
     glPopMatrix();
 
 
