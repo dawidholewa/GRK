@@ -7,7 +7,7 @@ class Kula
     public:
         Kula(float promien, float srodek[]);
         void Rysuj();
-        void RysujAnimacje(float x, float y, float z);
+        void RysujAnimacje(float p, int ilosc, float obrot[]);
 
     protected:
     private:

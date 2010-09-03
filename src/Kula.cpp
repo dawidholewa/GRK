@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <math.h>
 #include "../include/Kula.h"
 
 Kula::Kula(float promien, float srodek[])
@@ -37,6 +38,23 @@ void Kula::Rysuj() {
     glCallList(ball);
 }
 
-void Kula::RysujAnimacje(float x, float y, float z) {
+void Kula::RysujAnimacje(float p, int ilosc,float obrot[]) {
+    if(!wygenerowane) {
+        generujKule();
+        wygenerowane = true;
+    }
 
+    glPushMatrix();
+        glRotatef(obrot[0], obrot[1], obrot[2], obrot[3]);
+        for(float kat=0;kat<360;kat+=360/ilosc)
+        {
+            GLfloat x,z;
+            x = p*cos(kat/180*3.14);
+            z = p*sin(kat/180*3.14);
+            glPushMatrix();
+                glTranslatef(x, 0.0f, z);
+                glCallList(ball);
+            glPopMatrix();
+        }
+    glPopMatrix();
 }

@@ -2,6 +2,7 @@
 // Date: 01-09-2010
 #include <iostream>
 #include <GL/glut.h>
+#include <math.h>
 #include "include/Kula.h"
 #include "include/Pokoj.h"
 #include "include/Pudelko.h"
@@ -9,7 +10,9 @@
 
 using namespace std;
 Tekstura* textura;
-float obrot = 10;
+
+float obrot = 0.0f;
+bool obrot_kol = false;
 
 // Funkcja ustawiajaca podstaweowe ustawienia.
 void init() {
@@ -30,12 +33,17 @@ void init() {
 
 // Funkcja obslugujaca rysowanie obrazu wyswietlanego uzytkownikowi.
 void wyswietl() {
+    // Przelaczamy sie na macierz dotyczaca modelu.
+    glMatrixMode(GL_MODELVIEW);
+
+    // Resetujemy ustawienia macierzy modelu.
+    glLoadIdentity();
 
     // Czyszczenie buforow.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(  140.0f, 40.0f, 140.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(  140.0f, 80.0f, 140.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
@@ -47,16 +55,17 @@ void wyswietl() {
         p->Rysuj();
     glPopMatrix();
 
-    glPushMatrix();
-        Pudelko* box = new Pudelko(10);
-        box->SetTekstura(textura->pobierz(2));
-        box->RysujPiramide(3,2);
-    glPopMatrix();
+//    glPushMatrix();
+//        Pudelko* box = new Pudelko(10);
+//        box->SetTekstura(textura->pobierz(2));
+//        box->RysujPiramide(3,2);
+//    glPopMatrix();
 
     glPushMatrix();
         float s[3] = {0.0f,30.0f,0.0f};
-        Kula* ball = new Kula(10,s);
-        ball->Rysuj();
+        Kula* ball = new Kula(2,s);
+        float o[4] = {obrot,0.0f, 1.0f, 0.0f};
+        ball->RysujAnimacje(10,5,o);
     glPopMatrix();
 
 
@@ -84,12 +93,6 @@ void skalujObraz(int szer, int wys) {
     // Ustawiamy widok odpowiedniej perspektywy.
     gluPerspective(45, stosunek, 0.1f, 1000.0f);
 
-    // Przelaczamy sie na macierz dotyczaca modelu.
-    glMatrixMode(GL_MODELVIEW);
-
-    // Resetujemy ustawienia macierzy modelu.
-    glLoadIdentity();
-
 }
 
 // Funkcja obslugujaca klawiature.
@@ -98,13 +101,18 @@ void klawiatura(unsigned char klawisz, int x, int y) {
         case 27: // Zamkniecie programu po wcisnieciu klawisza ESC.
             exit(0);
             break;
-        case '=':
-            obrot++;
+        case '+':
+            obrot += 2.0f;
+            fmod(obrot, 360);
             glutPostRedisplay();
             break;
         case '-':
-            obrot--;
+            obrot -= 2.0f;
+            fmod(obrot, 360);
             glutPostRedisplay();
+            break;
+        case 'k':
+            obrot_kol = !obrot_kol;
             break;
     }
 }
