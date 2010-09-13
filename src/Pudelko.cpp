@@ -134,6 +134,7 @@ void Pudelko::Rysuj() {
         wygenerowane = true;
     }
     glCallList(box);
+    glDisable(GL_TEXTURE_2D);
 }
 
 void Pudelko::RysujPiramide(int szer, int wys) {
@@ -167,6 +168,7 @@ void Pudelko::RysujPiramide(int szer, int wys) {
             glTranslatef(szerokosc/2,0.0f,szerokosc/2);
         }
     glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
 }
 
 // TODO: Poprawa obliczania wspolrzednych cienia

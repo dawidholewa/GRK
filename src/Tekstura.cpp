@@ -38,6 +38,7 @@ bool Tekstura::laduj(char *nazwa) {
         glTexImage2D(GL_TEXTURE_2D, 0, 3, t[0]->sizeX, t[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, t[0]->data);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
     ostatni_nr++;

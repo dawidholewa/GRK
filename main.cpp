@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include "include/Kula.h"
+#include "include/Mgla.h"
 #include "include/Pokoj.h"
 #include "include/Pudelko.h"
 #include "include/Tekstura.h"
@@ -12,38 +13,82 @@ using namespace std;
 Tekstura* textura;
 
 float obrot = 0.0f;
-bool obrot_kol = false;
+bool obrot_orbit = true;
+bool swiatla = true;
 
 // Listy obiektow w celu przyspieszenia renderowania.
-GLuint choinka; // Lista wyswietlania kilku kuli.
+GLuint orbity1, orbity2;
 
 // Tutaj tworzymy generujemy listy wszystkich obiektow.
 void initObjects() {
+
     // Choinka z kulek.
-    choinka = glGenLists(1);
+    orbity1 = glGenLists(3);
+    orbity2 = orbity1+1;
 
-    int ilosc_poziomow_choinki = 15;
-    glNewList(choinka,GL_COMPILE);
+    // Srodek orbit
+    float so[3] = {0.0f, 0.0f, 0.0f};
+
+    // Tablica kolorow
+    float kolor[10][3] = {
+        {1.0f, 0.0f, 0.0f}, // Jasny czerwony
+        {1.0f, 0.5f, 0.0f}, // Jasny pomaranczowy
+        {1.0f, 1.0f, 0.0f}, // Jasny zolty
+        {0.0f, 1.0f, 0.0f}, // Jasny zielony
+        {0.0f, 1.0f, 1.0f}, // Jasny niebieski
+        {0.5f, 0.0f, 0.0f}, // Ciemny czerwony
+        {0.5f, 0.25f,0.0f}, // Ciemny pomaranczowy
+        {0.5f, 0.5f, 0.0f}, // Ciemny zolty
+        {0.0f, 0.5f, 0.0f}, // Ciemny zielony
+        {0.0f, 0.5f, 0.5f}  // Ciemny niebieski
+    };
+
+    Kula* planeta = new Kula(2,so);
+    planeta->SetKolors(10,*kolor);
+
+    // Orbita pozioma
+    glNewList(orbity1,GL_COMPILE);
         glPushMatrix();
-
-            float s[3] = {0.0f,4.0f+ilosc_poziomow_choinki*5,0.0f};
-            float kolor[5][3] = {
-                {0.0f,0.4f,0.8f},
-                {0.2f,0.6f,0.4f},
-                {0.4f,0.6f,0.2f},
-                {0.8f,0.4f,0.0f},
-                {0.5f,0.4f,0.5f}
-            };
-            Kula* ball = new Kula(2,s);
-            ball->SetKolors(3,*kolor);
-            for(int i=0; i<ilosc_poziomow_choinki; i++) {
-                glPushMatrix();
-                glTranslatef(0.0f,-5.0*i,0.0f);
-                ball->RysujAnimacje(i+3,i+1, true);
-                glPopMatrix();
-            }
+            glTranslatef(0.0f, 20.0f, 0.0f);
+            planeta->RysujAnimacje(10,6, true);
         glPopMatrix();
     glEndList();
+
+    // Orbita pionowa
+    glNewList(orbity2,GL_COMPILE);
+            glPushMatrix();
+                glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+                planeta->RysujAnimacje(10,5, true);
+            glPopMatrix();
+    glEndList();
+}
+
+void initSwiatlo() {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+
+    // Swiatlo otaczajace, rozproszone
+    float s_otoczenia[4]   = {0.2f, 0.2f, 0.2f, 1.0f};
+    float s_rozproszone[4] = {0.5f, 0.5f, 0.5f, 1.0f};
+
+    // Pozycja swiatla
+    float p_light1[3] = {0.0f, 30.0f, 0.0f};
+    float p_light2[3] = {80.0f, 10.0f, 0.0f};
+
+    glLightfv(GL_LIGHT1, GL_AMBIENT, s_otoczenia);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, s_rozproszone);
+    glLightfv(GL_LIGHT1, GL_POSITION, p_light1);
+    glEnable(GL_LIGHT1);
+
+    glLightfv(GL_LIGHT2, GL_AMBIENT, s_otoczenia);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, s_rozproszone);
+    glLightfv(GL_LIGHT2, GL_POSITION, p_light1);
+    //glEnable(GL_LIGHT2);
+
+    float material[4]={1.0, 1.0, 1.0,1.0};
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material);
 
 }
 
@@ -63,6 +108,12 @@ void init() {
     // Niezbedne do tego aby uniknac wzajemnego przenikania sie obiektow.
     glEnable(GL_DEPTH_TEST);
 
+    // Miekie cieniowanie
+    glEnable(GL_SMOOTH);
+
+    // Uruchomienie swiatla
+    initSwiatlo();
+
     // Generowanie listy obiektow.
     initObjects();
 }
@@ -79,27 +130,45 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(  140.0f, 80.0f, 140.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(  80.0f, 40.0f, 80.0f, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
 
-    // TUTAJ RESZTA KODU !!!
+    // Tworzymy obiekt pokoju.
+    Pokoj* pokoj = new Pokoj(140, true);
+    pokoj->SetTeksturaPodlogi(textura->pobierz(0));
+    pokoj->SetTeksturaSciany(textura->pobierz(1));
+
+    // Tworzymy obiekt pudelka.
+    Pudelko* pudelko = new Pudelko(6);
+    pudelko->SetTekstura(textura->pobierz(2));
+
     glPushMatrix();
-        Pokoj* p = new Pokoj(140.0f, true);
-        p->SetTeksturaPodlogi(textura->pobierz(0));
-        p->SetTeksturaSciany(textura->pobierz(1));
-        p->Rysuj();
+        // Rysujemy pomieszczenie.
+        pokoj->Rysuj();
+
+        // Rysujemy piramide pudelek.
+        pudelko->RysujPiramide(6,4);
     glPopMatrix();
 
-//    glPushMatrix();
-//        Pudelko* box = new Pudelko(10);
-//        box->SetTekstura(textura->pobierz(2));
-//        box->RysujPiramide(3,2);
-//    glPopMatrix();
-
+    // Latajace orbity
     glPushMatrix();
-        glRotatef(obrot, 0.0f, 1.0f, 0.0f);
-        glCallList(choinka);
+        glRotatef(fmod(obrot/2,360), 0.0f, 1.0f, 0.0f);
+        glTranslatef(-20.0f, 15.0f, -20.0f);
+
+        // Obrot poziomej orbity
+        glPushMatrix();
+            glRotatef(obrot, 0.0f, 1.0f, 0.0f);
+            glCallList(orbity1);
+        glPopMatrix();
+
+        // Obrot pionowej orbity
+        glPushMatrix();
+            glTranslatef(7.0f, 20.0f, 0.0f);
+            glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
+            glRotatef(-fmod(obrot*2,360), 0.0f, 0.0f, 1.0f);
+            glCallList(orbity2);
+        glPopMatrix();
     glPopMatrix();
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
@@ -134,19 +203,35 @@ void klawiatura(unsigned char klawisz, int x, int y) {
         case 27: // Zamkniecie programu po wcisnieciu klawisza ESC.
             exit(0);
             break;
-        case '+':
-            obrot += 2.0f;
-            fmod(obrot, 360);
-            glutPostRedisplay();
+        case 'q':
+            if(obrot_orbit) {
+                obrot += 2.0f;
+                fmod(obrot, 360);
+                glutPostRedisplay();
+            }
             break;
-        case '-':
-            obrot -= 2.0f;
-            fmod(obrot, 360);
-            glutPostRedisplay();
+        case 'w':
+            if(obrot_orbit) {
+                obrot -= 2.0f;
+                fmod(obrot, 360);
+                glutPostRedisplay();
+            }
             break;
-        case 'k':
-            obrot_kol = !obrot_kol;
+        case 'o':
+            obrot_orbit = !obrot_orbit;
             break;
+        case 's':
+            swiatla = !swiatla;
+            break;
+    }
+}
+
+// Funkcja obslugi animacji
+void animuj() {
+    if(obrot_orbit) {
+        obrot += 0.75f;
+        fmod(obrot, 360);
+        glutPostRedisplay();
     }
 }
 
@@ -168,6 +253,7 @@ int main(int argc, char * argv[]) {
     glutDisplayFunc(wyswietl);
     glutReshapeFunc(skalujObraz);
     glutKeyboardFunc(klawiatura);
+    glutIdleFunc(animuj);
 
     // Uruchomienie glownej petli OpenGLa programu
     glutMainLoop();
