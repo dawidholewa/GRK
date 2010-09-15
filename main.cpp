@@ -16,6 +16,9 @@ float obrot = 0.0f;
 bool obrot_orbit = true;
 bool swiatla = true;
 
+float kamera_x_z = 80.0f;
+float kamera_obrot = 0.0f;
+
 // Listy obiektow w celu przyspieszenia renderowania.
 GLuint orbity1, orbity2;
 
@@ -66,30 +69,18 @@ void initObjects() {
 void initSwiatlo() {
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHT0);
 
     // Swiatlo otaczajace, rozproszone
     float s_otoczenia[4]   = {0.2f, 0.2f, 0.2f, 1.0f};
     float s_rozproszone[4] = {0.5f, 0.5f, 0.5f, 1.0f};
 
-    // Pozycja swiatla
-    float p_light1[3] = {0.0f, 30.0f, 0.0f};
-    float p_light2[3] = {80.0f, 10.0f, 0.0f};
+    float p_light0[3] = {10.0f, 10.0f, 10.0f};
+    float d_light0[3] = {-1.0f, -1.0f, -1.0f}; // Kierunek
 
-    glLightfv(GL_LIGHT1, GL_AMBIENT, s_otoczenia);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, s_rozproszone);
-    glLightfv(GL_LIGHT1, GL_POSITION, p_light1);
-    glEnable(GL_LIGHT1);
-
-    glLightfv(GL_LIGHT2, GL_AMBIENT, s_otoczenia);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, s_rozproszone);
-    glLightfv(GL_LIGHT2, GL_POSITION, p_light1);
-    //glEnable(GL_LIGHT2);
-
-    float material[4]={1.0, 1.0, 1.0,1.0};
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material);
-
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0f);
+    glLightfv(GL_LIGHT0, GL_POSITION, p_light0);
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, d_light0);
 }
 
 // Funkcja ustawiajaca podstaweowe ustawienia.
@@ -111,6 +102,8 @@ void init() {
     // Miekie cieniowanie
     glEnable(GL_SMOOTH);
 
+    glEnable(GL_NORMALIZE);
+
     // Uruchomienie swiatla
     initSwiatlo();
 
@@ -130,46 +123,53 @@ void wyswietl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Ustawienie kierunku w ktorym bedziemy patrzec.
-    gluLookAt(  80.0f, 40.0f, 80.0f, // x,y,z Lokalizacja oka.
+    gluLookAt(  kamera_x_z, 50.0f, kamera_x_z, // x,y,z Lokalizacja oka.
                 0.0f,  0.0f,   0.0f, // x,y,z Lokalizacja centralnego punktu.
                 0.0f,  1.0f,   0.0f);
-
-    // Tworzymy obiekt pokoju.
-    Pokoj* pokoj = new Pokoj(140, true);
-    pokoj->SetTeksturaPodlogi(textura->pobierz(0));
-    pokoj->SetTeksturaSciany(textura->pobierz(1));
-
-    // Tworzymy obiekt pudelka.
-    Pudelko* pudelko = new Pudelko(6);
-    pudelko->SetTekstura(textura->pobierz(2));
-
+    glRotatef(kamera_obrot, 0.0f, 1.0f, 0.0f);
     glPushMatrix();
-        // Rysujemy pomieszczenie.
-        pokoj->Rysuj();
+        // Tworzymy obiekt pokoju.
+        Pokoj* pokoj = new Pokoj(140, true);
+        pokoj->SetTeksturaPodlogi(textura->pobierz(0));
+        pokoj->SetTeksturaSciany(textura->pobierz(1));
 
-        // Rysujemy piramide pudelek.
-        pudelko->RysujPiramide(6,4);
-    glPopMatrix();
+        // Tworzymy obiekt pudelka.
+        Pudelko* pudelko = new Pudelko(6);
+        pudelko->SetTekstura(textura->pobierz(2));
 
-    // Latajace orbity
-    glPushMatrix();
-        glRotatef(fmod(obrot/2,360), 0.0f, 1.0f, 0.0f);
-        glTranslatef(-20.0f, 15.0f, -20.0f);
 
-        // Obrot poziomej orbity
         glPushMatrix();
-            glRotatef(obrot, 0.0f, 1.0f, 0.0f);
-            glCallList(orbity1);
+            // Rysujemy pomieszczenie.
+            pokoj->Rysuj();
+
+            // Rysujemy piramide pudelek.
+            glTranslatef(0.0f, -6.0f, 0.0f);
+            pudelko->RysujPiramide(6,4);
         glPopMatrix();
 
-        // Obrot pionowej orbity
+        // Latajace orbity
         glPushMatrix();
-            glTranslatef(7.0f, 20.0f, 0.0f);
-            glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
-            glRotatef(-fmod(obrot*2,360), 0.0f, 0.0f, 1.0f);
-            glCallList(orbity2);
+            glRotatef(fmod(obrot/2,360), 0.0f, 1.0f, 0.0f);
+            glTranslatef(-20.0f, 15.0f, -20.0f);
+
+            // Obrot poziomej orbity
+            glPushMatrix();
+                glRotatef(obrot, 0.0f, 1.0f, 0.0f);
+                glCallList(orbity1);
+            glPopMatrix();
+
+            // Obrot pionowej orbity
+            glPushMatrix();
+                glTranslatef(7.0f, 20.0f, 0.0f);
+                glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
+                glRotatef(-fmod(obrot*2,360), 0.0f, 0.0f, 1.0f);
+                glCallList(orbity2);
+            glPopMatrix();
         glPopMatrix();
     glPopMatrix();
+
+    //Mgla* mgla = new Mgla();
+    //mgla->wlacz(true);
 
     // Polecenie wykonania wywolanych do tej pory funkcji.
     glFlush();
@@ -204,24 +204,38 @@ void klawiatura(unsigned char klawisz, int x, int y) {
             exit(0);
             break;
         case 'q':
-            if(obrot_orbit) {
-                obrot += 2.0f;
-                fmod(obrot, 360);
-                glutPostRedisplay();
-            }
+            obrot += 2.0f;
+            fmod(obrot, 360);
+            glutPostRedisplay();
             break;
         case 'w':
-            if(obrot_orbit) {
-                obrot -= 2.0f;
-                fmod(obrot, 360);
-                glutPostRedisplay();
-            }
+            obrot -= 2.0f;
+            fmod(obrot, 360);
+            glutPostRedisplay();
             break;
         case 'o':
             obrot_orbit = !obrot_orbit;
             break;
         case 's':
             swiatla = !swiatla;
+            if(swiatla) glEnable(GL_LIGHTING); else glDisable(GL_LIGHTING);
+            break;
+        case 'd':
+            kamera_x_z += 1.0f;
+            fmod(kamera_x_z, 100);
+            break;
+        case 'b':
+            kamera_x_z -= 1.0f;
+            fmod(kamera_x_z, 100);
+            if (kamera_x_z < 0) kamera_x_z = -kamera_x_z;
+            break;
+        case 'p':
+            kamera_obrot += 1;
+            fmod(kamera_obrot, 360);
+            break;
+        case 'l':
+            kamera_obrot -= 1;
+            fmod(kamera_obrot, 360);
             break;
     }
 }

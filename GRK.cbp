@@ -38,11 +38,13 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="include\Kula.h" />
+		<Unit filename="include\Mgla.h" />
 		<Unit filename="include\Pokoj.h" />
 		<Unit filename="include\Pudelko.h" />
 		<Unit filename="include\Tekstura.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src\Kula.cpp" />
+		<Unit filename="src\Mgla.cpp" />
 		<Unit filename="src\Pokoj.cpp" />
 		<Unit filename="src\Pudelko.cpp" />
 		<Unit filename="src\Tekstura.cpp" />
